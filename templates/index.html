@@ -1,0 +1,36 @@
+<!DOCTYPE HTML>
+
+<html>
+    <head>
+	<title>Dashboard</title>
+    </head>
+
+    <body>
+	<h1> Welcome Back, {{ username }} </h1>
+	<h2> ${{ amount }} </h2>
+
+	<form name="deposit" method="post" action="/deposit">
+	    <input type="number" name="amount" step="0.01" min="1" placeholder="Deposit Amount" required>
+	    <input type="submit" value="Deposit">
+	</form>
+	
+
+	<form name="deposit" method="post" action="/withdraw">
+	    <input type="number" name="amount" step="0.01" min="1" max= {{ amount }} placeholder="Withdraw Amount" required>
+	    <input type="submit" value="Withdraw">
+	</form>
+	<form name="transfer" method="post" action="/transfer">
+	    <input type="number" name="amount" step="0.01" min="1" max= {{ amount }} placeholder="Transfer Amount" required>
+	    <input type="text" required name="target">
+	    <input type="submit" value="Transfer">
+	</form>
+		<form method="get" action="/logout">	
+		<input type="submit" value="Logout">
+	</form>
+	<h2> Recent Transactions </h2>
+	{{ recents|safe }}
+    
+    </body>
+</html>
+	
+	
