@@ -3,25 +3,26 @@ import re
 from datetime import datetime
 
 class BankAccount:
-
+    """class for bankacccounts"""
     def __init__(self, name, amount=0):
-
+        """init method for bankaccount"""
         self.name = name
-        
+
         connection = sqlite3.connect('/home/BorneAgain/Desktop/flasktest/accounts.db')
 
-        cursor = connection.cursor() 
+        cursor = connection.cursor()
         
-        cursor.execute("""select name from accounts where name=?""",(self.name,))
+        cursor.execute("""select name from accounts where name=?""", (self.name, ))
 
         if len(cursor.fetchall()) == 0:
 
             self.createNew(amount)
 
     def __str__(self):
-
+        """for debugging purposes"""
         return self.name + ': $'+str(self.getBalance())
-    def createNew(self,amount):
+    def createNew(self, amount):
+        """creates new bankaccount"""
 
         connection = sqlite3.connect('/home/BorneAgain/Desktop/flasktest/accounts.db')
         
@@ -34,71 +35,72 @@ class BankAccount:
             );"""
         cursor.execute(sql_command)
         '''
-        t = (self.name,amount)
-        sql_command = """INSERT INTO  accounts (name,amount)
-            VALUES (?,?);"""
-        cursor.execute(sql_command,t)
+        t = (self.name, amount)
+        sql_command = """INSERT INTO  accounts (name, amount)
+            VALUES (?, ?);"""
+        cursor.execute(sql_command, t)
          
         connection.commit()
     def getBalance(self):
-        
+        """gets balance of account"""
         connection = sqlite3.connect('/home/BorneAgain/Desktop/flasktest/accounts.db')
 
         cursor = connection.cursor()
 
         sql_command = """select amount from accounts where name=?;"""
 
-        cursor.execute(sql_command,(self.name,))
+        cursor.execute(sql_command, (self.name, ))
 
-        return round(float(re.sub(r'[\(\),]','',str(cursor.fetchone()))),2)
+        return round(float(re.sub(r'[\(\),]', '', str(cursor.fetchone()))), 2)
 
 
 
     def deposit(self, amount):
+        """deposits money into account"""
         connection = sqlite3.connect('/home/BorneAgain/Desktop/flasktest/accounts.db')
 
         cursor = connection.cursor()
 
         if self.getBalance() + amount > 0:
-            cursor.execute("""update accounts set amount=? where name =?;""",(amount+self.getBalance(),self.name))
-            cursor.execute("""insert into history (username,dt,amount) values (?,?,?);""",(self.name,datetime.utcnow(),amount))
+            cursor.execute("""update accounts set amount=? where name =?;""", (amount+self.getBalance(), self.name))
+            cursor.execute("""insert into history (username,dt,amount) values (?,?,?);""", (self.name, datetime.utcnow(), amount))
         else:
             
-            cursor.execute("""update accounts set amount=? where name =?;""",(0,self.name))
+            cursor.execute("""update accounts set amount=? where name =?;""", (0, self.name))
 
-            cursor.execute("""insert into history (username,dt,amount) values (?,?,?);""",(self.name,datetime.utcnow(),amount))
+            cursor.execute("""insert into history (username,dt,amount) values (?,?,?);""", (self.name, datetime.utcnow(), amount))
         connection.commit()
 
     def withdraw(self, amount):
-
+        """withdraws money from account"""
         self.deposit(-amount)
 
 
     def recents(self):
-
+        """sees recent transactions"""
         connection = sqlite3.connect('/home/BorneAgain/Desktop/flasktest/accounts.db')
 
         cursor = connection.cursor()
 
-        cursor.execute("""select * from history where username=?""",(self.name,))
+        cursor.execute("""select * from history where username=?""", (self.name, ))
 
         return cursor.fetchall()
 
 
     def transfer(self, amount, target):
-
+        """transfers money to other users"""
 
         connection = sqlite3.connect('/home/BorneAgain/Desktop/flasktest/accounts.db')
 
         cursor = connection.cursor()
 
-        cursor.execute("""select * from accounts where name=?""",(target,))
+        cursor.execute("""select * from accounts where name=?""", (target, ))
 
         if len(cursor.fetchall()) > 0:
 
             self.withdraw(amount)
 
-            cursor.execute("""update accounts set amount=amount+? where name=?""",(amount,target))
+            cursor.execute("""update accounts set amount=amount+? where name=?""", (amount, target))
             
             connection.commit()
 
@@ -121,7 +123,7 @@ if __name__ == "__main__":
     
     print(cursor.fetchall())
     '''
-    acct = BankAccount('porter',100)
+    acct = BankAccount('porter', 100)
     
     acct.deposit(200.11)
 
